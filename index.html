@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TextTransfer</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f2f2f2;
+            margin: 0;
+            padding: 0;
+        }
+
+        #container {
+            max-width: 80%;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        input,
+        textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        #transferButton {
+            background-color: #007BFF;
+            color: #fff;
+            border: none;
+        }
+
+        #transferButton:hover,
+        #showButton:hover,
+        #clearButton:hover,
+        #copyButton:hover {
+            background-color: #0056b3;
+        }
+
+        #showButton {
+            background-color: #28a745;
+            color: #fff;
+            border: none;
+        }
+
+        #showButton:hover {
+            background-color: #218838;
+        }
+
+        #clearButton {
+            background-color: #f00;
+            color: #fff;
+            border: none;
+        }
+
+        #copyButton {
+            background-color: #ffc107;
+            color: #333;
+            border: 1px solid #ffc107;
+        }
+
+        #copyButton:hover {
+            background-color: #e0a800;
+            color: #fff;
+        }
+
+        #resultContainer {
+            padding: 20px;
+            margin-top: 20px;
+            border-radius: 8px;
+            color: #333;
+            text-align: left;
+        }
+
+        #transferResult {
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        @media only screen and (min-width: 600px) {
+            #container {
+                max-width: 400px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="container">
+        <h1>TextTransfer</h1>
+        <input type="text" id="addressInput" placeholder="Enter private address">
+        <textarea id="textInput" placeholder="Paste your text"></textarea>
+        <button id="transferButton">Transfer</button>
+        <button id="copyButton">Copy</button>
+        <button id="showButton">Show</button>
+        <button id="clearButton">Clear</button>
+    </div>
+    <div id="resultContainer">
+        <p id="transferResult">Ready to transfer...</p>
+    </div>
+    <script src="https://www.gstatic.com/firebasejs/9.0.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.2/firebase-database-compat.js"></script>
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyADlyOlKOgsxYkudnyHHuQC4VFaRo9ZLfE",
+            authDomain: "college-final-45d95.firebaseapp.com",
+            projectId: "college-final-45d95",
+            storageBucket: "college-final-45d95.appspot.com",
+            messagingSenderId: "477087819429",
+            appId: "1:477087819429:web:5d5d5ac761fc13c6f1cf4c",
+            databaseURL: "https://college-final-45d95-default-rtdb.firebaseio.com"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+
+        const database = firebase.database();
+        const transferRef = database.ref("TextTransfer/data");
+
+        document.getElementById("transferButton").addEventListener("click", () => {
+            const addressInput = document.getElementById("addressInput").value;
+            const textInput = document.getElementById("textInput").value;
+
+            transferRef.child(addressInput).set(textInput, (error) => {
+                const resultMessage = document.getElementById("transferResult");
+                if (error) {
+                    resultMessage.textContent = "Transfer failed. Please try again.";
+                } else {
+                    resultMessage.textContent = "Text transferred successfully!";
+                }
+            });
+        });
+
+        document.getElementById("showButton").addEventListener("click", () => {
+            const addressInput = document.getElementById("addressInput").value;
+
+            transferRef.child(addressInput).on("value", (snapshot) => {
+                const textInput = document.getElementById("textInput");
+                textInput.value = snapshot.val() || "";
+            });
+        });
+
+        document.getElementById("clearButton").addEventListener("click", () => {
+            document.getElementById("textInput").value = "";
+        });
+
+        document.getElementById("copyButton").addEventListener("click", () => {
+            const textInput = document.getElementById("textInput").value;
+
+            const tempInput = document.createElement("textarea");
+            tempInput.value = textInput;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand("copy");
+            document.body.removeChild(tempInput);
+        });
+    </script>
+</body>
+
+</html>
